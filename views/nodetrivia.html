@@ -1,0 +1,187 @@
+<html>
+<head>
+  <title>NodeTrivia Alpha</title>
+  <script src="scripts/jquery-3.4.1.min.js"></script>
+  
+  <link rel="stylesheet" href="styles/style.css"/>
+
+  <script>
+
+    // Session scoped variables
+    var currentQuestion;
+    var count = 0;
+    var correct = 0;
+    var currentAnswer = "";
+    var attempted = false;
+
+    var categories;
+
+    function init()
+    {
+      $.ajax({url: "https://opentdb.com/api_category.php", success: function(result) 
+      {
+        categories = result.trivia_categories;
+
+        for( loop = 0; loop < categories.length; loop++ )
+        {
+          optionText = categories[loop].name; 
+          optionValue = categories[loop].id; 
+  
+          $('#category').append(`<option value="${optionValue}">${optionText}</option>`);
+        }
+
+        $('body').fadeIn();
+      }});
+    }
+
+    /* Randomize array in-place using Durstenfeld shuffle algorithm */
+    function shuffleArray(array) 
+    {
+      for( var i = array.length - 1; i > 0; i-- ) 
+      {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+    }
+
+    function answerAttempt( guess )
+    {
+      if( attempted == true ) return;
+
+      attempted = true; 
+      resultOutput = "result" + count;
+
+      if( guess == currentAnswer )
+      {
+        correct++;
+        $("#score").html( correct );
+
+        $("#feedback").html( "<b>WELL DONE!</b>");
+        $("#" + resultOutput ).html( "<b>[CORRECT]</b>");
+      }
+      else
+      {
+        $("#feedback").html( "<b>SORRY, INCORRECT ANSWER!</b>");
+        $("#" + resultOutput ).html( "<b>[INCORRECT]</b>");
+      }
+    }
+
+    function loadBasicQuestion()
+    {
+      $("#feedback").html("");
+
+      questionURL = "https://opentdb.com/api.php?amount=1";
+
+      categoryVal = $('#category').val();
+
+      if( categoryVal != "all" ) questionURL += "&category=" + categoryVal;
+
+      $.ajax({url: questionURL, success: function(result) 
+      {
+        currentQuestion = result;
+
+        if( currentQuestion.response_code == 0 )
+        {
+          // Increment the question count
+          count++;
+          $("#count").html( count );
+
+          attempted = false;
+
+          var output = "<span class='question'><b>(" + count + ") " + currentQuestion.results[0].category + "</b> (" + currentQuestion.results[0].difficulty + ")</span>&nbsp;<span id='result" + count + "'></span><br/>";
+          output += "<span class='question'><i>" + currentQuestion.results[0].question + "</i></span><br/>";
+
+          var answers = [];
+          currentAnswer = currentQuestion.results[0].correct_answer;
+
+          if( currentQuestion.results[0].type == "multiple" )
+          {
+            answers.push(currentAnswer);
+
+            for( loop = 0; loop < currentQuestion.results[0].incorrect_answers.length; loop++ )
+            {
+              answers.push(currentQuestion.results[0].incorrect_answers[loop]);
+            }
+
+            shuffleArray(answers);
+          }
+          else
+          {
+            answers.push("True");
+            answers.push("False");
+          }
+
+          for( loop = 0; loop < answers.length; loop++ )
+          {
+            output += "<input type='button' value='" + answers[loop] + "' onClick='answerAttempt(\"" + answers[loop] + "\");' class='answerButton'/>&nbsp;";
+          }
+
+          currentContent = $("#questions").html();
+          $("#questions").html(output + "<hr width='100%'/>" + currentContent );
+        }
+      }});
+    }
+
+    function reveal( targetName )
+    {
+      target = document.getElementById(targetName);
+
+      target.style.display = ( target.style.display == "block" ? "none" : "block" );
+
+      buttonLabel = document.getElementById("hider").value;
+      document.getElementById("hider").value = ( document.getElementById("hider").value == "Reveal" ? "Hide" : "Reveal");
+    }
+
+  </script>
+   
+  <style>
+    div.scroller 
+    {
+      background-color: rgb(137, 140, 141);
+      color: white;
+      height: 350px;
+      overflow: scroll;
+
+      padding-top: 20px;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 20px;
+    }
+
+    span.intro
+    {
+      padding-top: 20px;
+      padding-left: 20px;
+      padding-right: 20px;
+      padding-bottom: 20px;
+    }
+
+  </style>
+</head>
+
+<body onload="init();" style="display:none" id="css-zen-garden">
+<div width="100%" align="right"><img src="/images/redhat.png" width="200px"/></div>
+
+<table width="800px" border=0>
+<tr>
+  <td width="180px" align="center"><img src="images/murphy3.png" width="200px"/></td>
+  <td align="center">
+      <h2>"MURPHY'S TRIVIAL PURRSUITS"</h2>
+      <h2>Open Trivia DB game on OpenShift</h2>
+      <h3>Score: <span id="score">0</span> from <span id="count">0</span> questions</h3>      
+  </td>
+</tr>
+
+</table><br/><br/>
+
+<input type="button" value="Click here to get a question..." onClick="loadBasicQuestion();" class="inputBrightLarge"/>&nbsp;<select id="category" class="selectBrightLarge"><option value="all">Any Category</option></select>
+<span id="feedback"></span><br/><br/>
+
+<div class="scroller" width="98%" height="200px" id="questions">
+
+</div>
+
+</body>
+</html>

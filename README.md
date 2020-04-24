@@ -1,2 +1,2 @@
-# nodetrivia
-Demo of Node based Trivia Questions based on Open Trivia DB
+# nodenews
+node.js app for real-time news feed processing, for OpenShift demos

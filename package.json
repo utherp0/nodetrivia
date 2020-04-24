@@ -1,0 +1,32 @@
+{
+  "name": "nodetrivia",
+  "version": "0.0.1",
+  "description": "Node.js trivia app demo for OCP",
+  "main": "server.js",
+  "dependencies": {
+    "ejs": "*",
+    "express": "*",
+    "got": "*",
+    "http": "*",
+    "mysql": "*",
+    "production": "0.0.2",
+    "xml-js": "*"
+  },
+  "engine": {
+    "node": "*",
+    "npm": "*"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/utherp0/nodetrivia"
+  },
+  "author": "Ian 'Uther' Lawson",
+  "license": "",
+  "bugs": {
+    "url": "http://github.com/utherp0/nodetrivia/issues"
+  },
+  "homepage": "http://github.com/utherp0/nodetrivia"
+}
