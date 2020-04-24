@@ -10,7 +10,8 @@
     "http": "*",
     "mysql": "*",
     "production": "0.0.2",
-    "xml-js": "*"
+    "xml-js": "*",
+    "request": ">=2.68.0"
   },
   "engine": {
     "node": "*",
